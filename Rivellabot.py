@@ -37,7 +37,8 @@ async def attachment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     tmp_file = "attachment.pdf"
     await attachment_file.download_to_drive(tmp_file)
     await update.message.reply_text("Start analysing...")
-    summary, keyword, assistant, file_id = parse_pdf(tmp_file)
+    client = get_openai_client()
+    summary, keyword, assistant, file_id = parse_pdf(client, tmp_file)
     await update.message.reply_text(f"Collecting review examples related to '{summary}', and the keyword '{keyword}'.")
     reviews = get_sample_reviews(summary=summary, keyword=keyword)
     await update.message.reply_text("Generating reviews with examples...")
