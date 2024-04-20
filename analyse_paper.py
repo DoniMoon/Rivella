@@ -54,18 +54,23 @@ def parse_pdf(client:OpenAI, pdf_file_path:str) -> Tuple[str, str, openai.types.
     return summary, keyword, reviewer, file_obj.id
 
 def get_sample_reviews(summary:str, keyword:str) -> List[str]:
-    # 
+    #
     client = openreview.api.OpenReviewClient(
         baseurl='https://api2.openreview.net',
         username=os.environ.get('openreview_id'),
         password=os.environ.get('openreview_pw'),
     )
-    results = []
-    notes = client.search_notes(summary,source='reply')
+    notes = []
+    #XXX kmkim: return pdfs with notes
+    pdfs = []
+    notes = client.search_notes(summary,source='reply',limit=3)
     if len(notes) < 3:
-        notes = client.search_notes(keyword,source='reply')
-    for note in notes[:3]:
+        notes += client.search_notes(keyword,source='reply',limit=3-len(notes))
+    for note in notes:
         note.content.pop('first_time_reviewer', None)
-        results.append(str(note.content))
-    return results
+        #results.append(str(note.content))
+        #XXX return the objects
+        #results.append(note)
+        pdfs.append(client.get_pdf(note.forum))
+    return notes, pdfs
 

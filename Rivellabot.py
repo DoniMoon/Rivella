@@ -40,7 +40,11 @@ async def attachment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     client = get_openai_client()
     summary, keyword, assistant, file_id = parse_pdf(client, tmp_file)
     await update.message.reply_text(f"Collecting review examples related to '{summary}', and the keyword '{keyword}'.")
-    reviews = get_sample_reviews(summary=summary, keyword=keyword)
+    reviews, pdfs = get_sample_reviews(summary=summary, keyword=keyword)
+    #XXX kmkim: write temp*.pdf files
+    for i, pdf in enumerate(pdfs):
+        with open(f"temp{i}.pdf", "wb") as f:
+            f.write(pdf)
     await update.message.reply_text("Generating reviews with examples...")
 
  #   await update.message.reply_document(tmp_file, caption=f"Thanks.")
