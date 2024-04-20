@@ -42,18 +42,23 @@ async def attachment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     client = get_openai_client()
     summary, keyword, assistant, file_id = parse_pdf(client, tmp_file)
     await update.message.reply_text(f"Collecting review examples related to '{summary}', and the keyword '{keyword}'.")
-    reviews, pdfs = get_sample_reviews(summary=summary, keyword=keyword)
+    reviews, pdfs = get_sample_reviews(client, summary=summary, keyword=keyword)
     #XXX kmkim: write temp*.pdf files
-    pdf_paths = []
-    for i, pdf in enumerate(pdfs):
-        with open(f"temp{i}.pdf", "wb") as f:
-            f.write(pdf)
-        pdf_paths.append(f"temp{i}.pdf")
+    pdf_paths = [[], [], []]
+    for i in range(3):
+        for j, pdf in enumerate(pdfs[i]):
+            with open(f"temp_{i}_{j}.pdf", "wb") as f:
+                f.write(pdf)
+            pdf_paths[i].append(f"temp_{i}_{j}.pdf")
     await update.message.reply_text("Generating reviews with examples...")
+
+    for i in range(3):
+        print('# pdfs for persona', i, len(pdf_paths[i]))
+        print('# reviews for persona', i, len(reviews[i]))
 
     review_texts = []
     for i, persona in enumerate(Base_personas):
-        review_texts.append(get_reviews(client,assistant, reviews, file_id, pdf_paths, user_request=persona))
+        review_texts.append(get_reviews(client, assistant, reviews[i], file_id, pdf_paths[i], user_request=persona))
         await update.message.reply_text(f"Review {i+1}\n\n{review_texts[-1]}")
 
  #   await update.message.reply_document(tmp_file, caption=f"Thanks.")
