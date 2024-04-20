@@ -14,4 +14,6 @@ python Rivellabot.py
 ```
 Now you can talk with your personal research assistant!
 
-https://github.com/DoniMoon/Rivella/issues/1#issue-2254536632
+<p align="center">
+  <img src="![image](https://github.com/DoniMoon/Rivella/assets/93722031/c0835dad-b46b-4310-84ba-7902e78bd0fd)">
+</p>
