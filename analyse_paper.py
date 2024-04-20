@@ -69,3 +69,20 @@ def get_sample_reviews(summary:str, keyword:str) -> List[str]:
         results.append(str(note.content))
     return results
 
+def get_reviews(client:OpenAI, reviews: List[str],user_request:str='',prev_reviews:List[str]=[]) -> str:
+    review_thread = client.beta.threads.create()
+    thread_message = client.beta.threads.messages.create(
+        review_thread.id,
+        role="user",
+        content=f"Here is the examples of related reviews." + '\n\n'.join(['Review ' + str(i+1) + ':\n' + r for i, r in enumerate(reviews)]) + '\nGenerate a review for my paper, following the examples I provided.',
+        attachments=[{'file_id':file_obj.id,'tools':[{"type": "file_search"}]}],
+    )
+    if prev_reviews:
+        for prev_review in prev_reviews:
+            thread_message = client.beta.threads.messages.create(
+                review_thread.id,
+                role="user",
+                content=f"Here is the examples of related reviews." + '\n\n'.join(['Review ' + str(i+1) + ':\n' + r for i, r in enumerate(reviews)]) + '\nGenerate a review for my paper, following the examples I provided.',
+                attachments=[{'file_id':file_obj.id,'tools':[{"type": "file_search"}]}],
+            )
+
