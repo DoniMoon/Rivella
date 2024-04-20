@@ -13,3 +13,5 @@ First, install requirements and set your private keys.
 python Rivellabot.py
 ```
 Now you can talk with your personal research assistant!
+
+https://github.com/DoniMoon/Rivella/issues/1#issue-2254536632
