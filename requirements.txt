@@ -1,0 +1,12 @@
+python-telegram-bot[job-queue] --pre
+audiofile
+librosa
+pdfrw
+requests
+numpy
+scipy
+Pillow
+transformers
+torch
+openai
+openreview-py
