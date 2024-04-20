@@ -2,7 +2,9 @@ import logging
 import os
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
-from analyse_paper import parse_pdf, get_sample_reviews, get_openai_client
+from analyse_paper import parse_pdf, get_sample_reviews, get_openai_client, get_reviews
+
+Base_personas = ['Write a skeptical review.', 'Write a favorable review.', 'Write a aggressive review.']
 
 # Enable logging
 logging.basicConfig(
@@ -42,10 +44,17 @@ async def attachment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await update.message.reply_text(f"Collecting review examples related to '{summary}', and the keyword '{keyword}'.")
     reviews, pdfs = get_sample_reviews(summary=summary, keyword=keyword)
     #XXX kmkim: write temp*.pdf files
+    pdf_paths = []
     for i, pdf in enumerate(pdfs):
         with open(f"temp{i}.pdf", "wb") as f:
             f.write(pdf)
+        pdf_paths.append(f"temp{i}.pdf")
     await update.message.reply_text("Generating reviews with examples...")
+
+    review_texts = []
+    for i, persona in enumerate(Base_personas):
+        review_texts.append(get_reviews(client,assistant, reviews, file_id, pdf_paths, user_request=persona))
+        await update.message.reply_text(f"Review {i+1}\n\n{review_texts[-1]}")
 
  #   await update.message.reply_document(tmp_file, caption=f"Thanks.")
 
